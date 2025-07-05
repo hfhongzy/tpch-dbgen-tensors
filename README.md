@@ -14,6 +14,8 @@ It is functionally equivalent to first generating `.csv` files and then converti
 
 Here's an example of generating scale factor (SF) 1.
 
+Before start, modify the `const std::string SAVE_ROOT` in `print.cpp`. Then, download [libtorch](https://pytorch.org/get-started/locally/) and config your own path in `CMakeLists.txt`.
+
 ```bash
 mkdir -p build/
 cd build/
@@ -22,14 +24,3 @@ make -j
 ./dbgen -s 1
 ```
 
-You can move it to another folder. Remember to move out tensors before you start generating another scale factor.
-
-```bash
-mkdir -p ../warehouse/
-
-for file in ./*.pth; do
-  filename=$(basename "$file")
-  newname="SF1-tensor-$filename"
-  mv "$file" "../warehouse/$newname"
-done
-```

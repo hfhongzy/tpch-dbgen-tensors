@@ -222,6 +222,15 @@ customer_columns = [
 */
 
 
+#include <sstream>
+const std::string SAVE_ROOT = "/home/jovyan/workspace/data/";
+
+void save_tensor(const torch::Tensor& tensor, const std::string& filename) {
+    std::ostringstream full_filename;
+    full_filename << SAVE_ROOT << "SF" << scale << "-tensor-" << filename;
+    torch::save(tensor, full_filename.str());
+}
+
 INT_t *C_CUSTKEY;
 STR_t *C_NAME;
 STR_t *C_ADDRESS;
@@ -251,35 +260,35 @@ void post_pr_cust() {
     fprintf(stderr, "post_pr_cust: saving pth.\n");
     
     torch::Tensor tensor = torch::from_blob(C_CUSTKEY, {rows}, TQP_INT_TYPE);
-    torch::save(tensor, "C_CUSTKEY.pth");
+    save_tensor(tensor,"C_CUSTKEY.pth");
     fprintf(stderr, "post_pr_cust: saved C_CUSTKEY.pth\n");
 
     tensor = torch::from_blob(C_NAME, {rows, 25}, TQP_STR_TYPE);
-    torch::save(tensor, "C_NAME.pth");
+    save_tensor(tensor, "C_NAME.pth");
     fprintf(stderr, "post_pr_cust: saved C_NAME.pth\n");
 
     tensor = torch::from_blob(C_ADDRESS, {rows, 40}, TQP_STR_TYPE);
-    torch::save(tensor, "C_ADDRESS.pth");
+    save_tensor(tensor, "C_ADDRESS.pth");
     fprintf(stderr, "post_pr_cust: saved C_ADDRESS.pth\n");
 
     tensor = torch::from_blob(C_NATIONKEY, {rows}, TQP_INT_TYPE);
-    torch::save(tensor, "C_NATIONKEY.pth");
+    save_tensor(tensor, "C_NATIONKEY.pth");
     fprintf(stderr, "post_pr_cust: saved C_NATIONKEY.pth\n");
 
     tensor = torch::from_blob(C_PHONE, {rows, 15}, TQP_STR_TYPE);
-    torch::save(tensor, "C_PHONE.pth");
+    save_tensor(tensor, "C_PHONE.pth");
     fprintf(stderr, "post_pr_cust: saved C_PHONE.pth\n");
 
     tensor = torch::from_blob(C_ACCTBAL, {rows}, TQP_FLOAT_TYPE);
-    torch::save(tensor, "C_ACCTBAL.pth");
+    save_tensor(tensor, "C_ACCTBAL.pth");
     fprintf(stderr, "post_pr_cust: saved C_ACCTBAL.pth\n");
 
     tensor = torch::from_blob(C_MKTSEGMENT, {rows, 10}, TQP_STR_TYPE);
-    torch::save(tensor, "C_MKTSEGMENT.pth");
+    save_tensor(tensor, "C_MKTSEGMENT.pth");
     fprintf(stderr, "post_pr_cust: saved C_MKTSEGMENT.pth\n");
 
     tensor = torch::from_blob(C_COMMENT, {rows, 117}, TQP_STR_TYPE);
-    torch::save(tensor, "C_COMMENT.pth");
+    save_tensor(tensor, "C_COMMENT.pth");
     fprintf(stderr, "post_pr_cust: saved C_COMMENT.pth\n");
 
     free(C_CUSTKEY);
@@ -376,35 +385,35 @@ void post_pr_order() {
     fprintf(stderr, "post_pr_order: saving pth.\n");
 
     torch::Tensor tensor = torch::from_blob(O_ORDERKEY, {rows}, TQP_INT_TYPE);
-    torch::save(tensor, "O_ORDERKEY.pth");
+    save_tensor(tensor, "O_ORDERKEY.pth");
     fprintf(stderr, "post_pr_order: saved O_ORDERKEY.pth\n");
     
     tensor = torch::from_blob(O_CUSTKEY, {rows}, TQP_INT_TYPE);
-    torch::save(tensor, "O_CUSTKEY.pth");
+    save_tensor(tensor, "O_CUSTKEY.pth");
     fprintf(stderr, "post_pr_order: saved O_CUSTKEY.pth\n");
 
     tensor = torch::from_blob(O_ORDERSTATUS, {rows}, TQP_STR_TYPE);
-    torch::save(tensor, "O_ORDERSTATUS.pth");
+    save_tensor(tensor, "O_ORDERSTATUS.pth");
     fprintf(stderr, "post_pr_order: saved O_ORDERSTATUS.pth\n");
 
     tensor = torch::from_blob(O_TOTALPRICE, {rows}, TQP_FLOAT_TYPE);
-    torch::save(tensor, "O_TOTALPRICE.pth");
+    save_tensor(tensor, "O_TOTALPRICE.pth");
     fprintf(stderr, "post_pr_order: saved O_TOTALPRICE.pth\n");
 
     tensor = torch::from_blob(O_ORDERDATE, {rows}, TQP_DATE_TYPE);
-    torch::save(tensor, "O_ORDERDATE.pth");
+    save_tensor(tensor, "O_ORDERDATE.pth");
     fprintf(stderr, "post_pr_order: saved O_ORDERDATE.pth\n");
 
     tensor = torch::from_blob(O_ORDERPRIORITY, {rows, 15}, TQP_STR_TYPE);
-    torch::save(tensor, "O_ORDERPRIORITY.pth");
+    save_tensor(tensor, "O_ORDERPRIORITY.pth");
     fprintf(stderr, "post_pr_order: saved O_ORDERPRIORITY.pth\n");
 
     tensor = torch::from_blob(O_SHIPPRIORITY, {rows}, TQP_INT_TYPE);
-    torch::save(tensor, "O_SHIPPRIORITY.pth");
+    save_tensor(tensor, "O_SHIPPRIORITY.pth");
     fprintf(stderr, "post_pr_order: saved O_SHIPPRIORITY.pth\n");
 
     tensor = torch::from_blob(O_COMMENT, {rows, 79}, TQP_STR_TYPE);
-    torch::save(tensor, "O_COMMENT.pth");
+    save_tensor(tensor, "O_COMMENT.pth");
     fprintf(stderr, "post_pr_order: saved O_COMMENT.pth\n");
 
     free(O_ORDERKEY);
@@ -568,59 +577,59 @@ void post_pr_line() {
     fprintf(stderr, "post_pr_line: saving pth.\n");
 
     torch::Tensor tensor = torch::from_blob(L_ORDERKEY, {rows}, TQP_INT_TYPE);
-    torch::save(tensor, "L_ORDERKEY.pth");
+    save_tensor(tensor, "L_ORDERKEY.pth");
     fprintf(stderr, "post_pr_line: saved L_ORDERKEY.pth\n");
     
     tensor = torch::from_blob(L_PARTKEY, {rows}, TQP_INT_TYPE);
-    torch::save(tensor, "L_PARTKEY.pth");
+    save_tensor(tensor, "L_PARTKEY.pth");
     fprintf(stderr, "post_pr_line: saved L_PARTKEY.pth\n");
 
     tensor = torch::from_blob(L_SUPPKEY, {rows}, TQP_INT_TYPE);
-    torch::save(tensor, "L_SUPPKEY.pth");
+    save_tensor(tensor, "L_SUPPKEY.pth");
     fprintf(stderr, "post_pr_line: saved L_SUPPKEY.pth\n");
 
     tensor = torch::from_blob(L_QUANTITY, {rows}, TQP_INT_TYPE);
-    torch::save(tensor, "L_QUANTITY.pth");
+    save_tensor(tensor, "L_QUANTITY.pth");
     fprintf(stderr, "post_pr_line: saved L_QUANTITY.pth\n");
 
     tensor = torch::from_blob(L_EXTENDEDPRICE, {rows}, TQP_FLOAT_TYPE);
-    torch::save(tensor, "L_EXTENDEDPRICE.pth");
+    save_tensor(tensor, "L_EXTENDEDPRICE.pth");
     fprintf(stderr, "post_pr_line: saved L_EXTENDEDPRICE.pth\n");
 
     tensor = torch::from_blob(L_DISCOUNT, {rows}, TQP_FLOAT_TYPE);
-    torch::save(tensor, "L_DISCOUNT.pth");
+    save_tensor(tensor, "L_DISCOUNT.pth");
     fprintf(stderr, "post_pr_line: saved L_DISCOUNT.pth\n");
 
     tensor = torch::from_blob(L_TAX, {rows}, TQP_FLOAT_TYPE);
-    torch::save(tensor, "L_TAX.pth");
+    save_tensor(tensor, "L_TAX.pth");
     fprintf(stderr, "post_pr_line: saved L_TAX.pth\n");
 
     tensor = torch::from_blob(L_RETURNFLAG, {rows}, TQP_STR_TYPE);
-    torch::save(tensor, "L_RETURNFLAG.pth");
+    save_tensor(tensor, "L_RETURNFLAG.pth");
     fprintf(stderr, "post_pr_line: saved L_RETURNFLAG.pth\n");
 
     tensor = torch::from_blob(L_LINESTATUS, {rows}, TQP_STR_TYPE);
-    torch::save(tensor, "L_LINESTATUS.pth");
+    save_tensor(tensor, "L_LINESTATUS.pth");
     fprintf(stderr, "post_pr_line: saved L_LINESTATUS.pth\n");
 
     tensor = torch::from_blob(L_SHIPDATE, {rows}, TQP_DATE_TYPE);
-    torch::save(tensor, "L_SHIPDATE.pth");
+    save_tensor(tensor, "L_SHIPDATE.pth");
     fprintf(stderr, "post_pr_line: saved L_SHIPDATE.pth\n");
 
     tensor = torch::from_blob(L_COMMITDATE, {rows}, TQP_DATE_TYPE);
-    torch::save(tensor, "L_COMMITDATE.pth");
+    save_tensor(tensor, "L_COMMITDATE.pth");
     fprintf(stderr, "post_pr_line: saved L_COMMITDATE.pth\n");
 
     tensor = torch::from_blob(L_RECEIPTDATE, {rows}, TQP_DATE_TYPE);
-    torch::save(tensor, "L_RECEIPTDATE.pth");
+    save_tensor(tensor, "L_RECEIPTDATE.pth");
     fprintf(stderr, "post_pr_line: saved L_RECEIPTDATE.pth\n");
 
     tensor = torch::from_blob(L_SHIPINSTRUCT, {rows, 25}, TQP_STR_TYPE);
-    torch::save(tensor, "L_SHIPINSTRUCT.pth");
+    save_tensor(tensor, "L_SHIPINSTRUCT.pth");
     fprintf(stderr, "post_pr_line: saved L_SHIPINSTRUCT.pth\n");
 
     tensor = torch::from_blob(L_SHIPMODE, {rows, 10}, TQP_STR_TYPE);
-    torch::save(tensor, "L_SHIPMODE.pth");
+    save_tensor(tensor, "L_SHIPMODE.pth");
     fprintf(stderr, "post_pr_line: saved L_SHIPMODE.pth\n");
 
     free(L_ORDERKEY);
@@ -789,35 +798,35 @@ void post_pr_part() {
     fprintf(stderr, "post_pr_part: saving pth.\n");
 
     torch::Tensor tensor = torch::from_blob(P_PARTKEY, {rows}, TQP_INT_TYPE);
-    torch::save(tensor, "P_PARTKEY.pth");
+    save_tensor(tensor, "P_PARTKEY.pth");
     fprintf(stderr, "post_pr_part: saved P_PARTKEY.pth\n");
 
     tensor = torch::from_blob(P_NAME, {rows, 55}, TQP_STR_TYPE);
-    torch::save(tensor, "P_NAME.pth");
+    save_tensor(tensor, "P_NAME.pth");
     fprintf(stderr, "post_pr_part: saved P_NAME.pth\n");
 
     tensor = torch::from_blob(P_MFGR, {rows, 25}, TQP_STR_TYPE);
-    torch::save(tensor, "P_MFGR.pth");
+    save_tensor(tensor, "P_MFGR.pth");
     fprintf(stderr, "post_pr_part: saved P_MFGR.pth\n");
 
     tensor = torch::from_blob(P_BRAND, {rows, 10}, TQP_STR_TYPE);
-    torch::save(tensor, "P_BRAND.pth");
+    save_tensor(tensor, "P_BRAND.pth");
     fprintf(stderr, "post_pr_part: saved P_BRAND.pth\n");
 
     tensor = torch::from_blob(P_TYPE, {rows, 25}, TQP_STR_TYPE);
-    torch::save(tensor, "P_TYPE.pth");
+    save_tensor(tensor, "P_TYPE.pth");
     fprintf(stderr, "post_pr_part: saved P_TYPE.pth\n");
 
     tensor = torch::from_blob(P_SIZE_, {rows}, TQP_INT_TYPE);
-    torch::save(tensor, "P_SIZE.pth");
+    save_tensor(tensor, "P_SIZE.pth");
     fprintf(stderr, "post_pr_part: saved P_SIZE.pth\n");
 
     tensor = torch::from_blob(P_CONTAINER, {rows, 10}, TQP_STR_TYPE);
-    torch::save(tensor, "P_CONTAINER.pth");
+    save_tensor(tensor, "P_CONTAINER.pth");
     fprintf(stderr, "post_pr_part: saved P_CONTAINER.pth\n");
 
     tensor = torch::from_blob(P_RETAILPRICE, {rows}, TQP_FLOAT_TYPE);
-    torch::save(tensor, "P_RETAILPRICE.pth");
+    save_tensor(tensor, "P_RETAILPRICE.pth");
     fprintf(stderr, "post_pr_part: saved P_RETAILPRICE.pth\n");
 
     free(P_PARTKEY);
@@ -901,19 +910,19 @@ void post_pr_psupp() {
     fprintf(stderr, "post_pr_psupp: saving pth.\n");
 
     torch::Tensor tensor = torch::from_blob(PS_PARTKEY, {rows}, TQP_INT_TYPE);
-    torch::save(tensor, "PS_PARTKEY.pth");
+    save_tensor(tensor, "PS_PARTKEY.pth");
     fprintf(stderr, "post_pr_psupp: saved PS_PARTKEY.pth\n");
 
     tensor = torch::from_blob(PS_SUPPKEY, {rows}, TQP_INT_TYPE);
-    torch::save(tensor, "PS_SUPPKEY.pth");
+    save_tensor(tensor, "PS_SUPPKEY.pth");
     fprintf(stderr, "post_pr_psupp: saved PS_SUPPKEY.pth\n");
 
     tensor = torch::from_blob(PS_AVAILQTY, {rows}, TQP_INT_TYPE);
-    torch::save(tensor, "PS_AVAILQTY.pth");
+    save_tensor(tensor, "PS_AVAILQTY.pth");
     fprintf(stderr, "post_pr_psupp: saved PS_AVAILQTY.pth\n");
 
     tensor = torch::from_blob(PS_SUPPLYCOST, {rows}, TQP_FLOAT_TYPE);
-    torch::save(tensor, "PS_SUPPLYCOST.pth");
+    save_tensor(tensor, "PS_SUPPLYCOST.pth");
     fprintf(stderr, "post_pr_psupp: saved PS_SUPPLYCOST.pth\n");
 
     free(PS_PARTKEY);
@@ -1030,31 +1039,31 @@ void post_pr_supp() {
     fprintf(stderr, "post_pr_supp: saving pth.\n");
 
     torch::Tensor tensor = torch::from_blob(S_SUPPKEY, {rows}, TQP_INT_TYPE);
-    torch::save(tensor, "S_SUPPKEY.pth");
+    save_tensor(tensor, "S_SUPPKEY.pth");
     fprintf(stderr, "post_pr_supp: saved S_SUPPKEY.pth\n");
 
     tensor = torch::from_blob(S_NAME, {rows, 25}, TQP_STR_TYPE);
-    torch::save(tensor, "S_NAME.pth");
+    save_tensor(tensor, "S_NAME.pth");
     fprintf(stderr, "post_pr_supp: saved S_NAME.pth\n");
 
     tensor = torch::from_blob(S_ADDRESS, {rows, 40}, TQP_STR_TYPE);
-    torch::save(tensor, "S_ADDRESS.pth");
+    save_tensor(tensor, "S_ADDRESS.pth");
     fprintf(stderr, "post_pr_supp: saved S_ADDRESS.pth\n");
 
     tensor = torch::from_blob(S_NATIONKEY, {rows}, TQP_INT_TYPE);
-    torch::save(tensor, "S_NATIONKEY.pth");
+    save_tensor(tensor, "S_NATIONKEY.pth");
     fprintf(stderr, "post_pr_supp: saved S_NATIONKEY.pth\n");
 
     tensor = torch::from_blob(S_PHONE, {rows, 15}, TQP_STR_TYPE);
-    torch::save(tensor, "S_PHONE.pth");
+    save_tensor(tensor, "S_PHONE.pth");
     fprintf(stderr, "post_pr_supp: saved S_PHONE.pth\n");
 
     tensor = torch::from_blob(S_ACCTBAL, {rows}, TQP_FLOAT_TYPE);
-    torch::save(tensor, "S_ACCTBAL.pth");
+    save_tensor(tensor, "S_ACCTBAL.pth");
     fprintf(stderr, "post_pr_supp: saved S_ACCTBAL.pth\n");
 
     tensor = torch::from_blob(S_COMMENT, {rows, 101}, TQP_STR_TYPE);
-    torch::save(tensor, "S_COMMENT.pth");
+    save_tensor(tensor, "S_COMMENT.pth");
     fprintf(stderr, "post_pr_supp: saved S_COMMENT.pth\n");
 
     free(S_SUPPKEY);
@@ -1125,13 +1134,13 @@ void post_pr_nation() {
     int64_t rows = cnt_N;
     fprintf(stderr, "post_pr_nation: saving pth.\n");
     torch::Tensor tensor = torch::from_blob(N_NATIONKEY, {rows}, TQP_INT_TYPE);
-    torch::save(tensor, "N_NATIONKEY.pth");
+    save_tensor(tensor, "N_NATIONKEY.pth");
     fprintf(stderr, "post_pr_nation: saved N_NATIONKEY.pth\n");
     tensor = torch::from_blob(N_NAME, {rows, 25}, TQP_STR_TYPE);
-    torch::save(tensor, "N_NAME.pth");
+    save_tensor(tensor, "N_NAME.pth");
     fprintf(stderr, "post_pr_nation: saved N_NAME.pth\n");
     tensor = torch::from_blob(N_REGIONKEY, {rows}, TQP_INT_TYPE);
-    torch::save(tensor, "N_REGIONKEY.pth");
+    save_tensor(tensor, "N_REGIONKEY.pth");
     fprintf(stderr, "post_pr_nation: saved N_REGIONKEY.pth\n");
     free(N_NATIONKEY);
     free(N_NAME);
@@ -1181,10 +1190,10 @@ void post_pr_region() {
     int64_t rows = cnt_R;
     fprintf(stderr, "post_pr_region: saving pth.\n");
     torch::Tensor tensor = torch::from_blob(R_REGIONKEY, {rows}, TQP_INT_TYPE);
-    torch::save(tensor, "R_REGIONKEY.pth");
+    save_tensor(tensor, "R_REGIONKEY.pth");
     fprintf(stderr, "post_pr_region: saved R_REGIONKEY.pth\n");
     tensor = torch::from_blob(R_NAME, {rows, 25}, TQP_STR_TYPE);
-    torch::save(tensor, "R_NAME.pth");
+    save_tensor(tensor, "R_NAME.pth");
     fprintf(stderr, "post_pr_region: saved R_NAME.pth\n");
     free(R_REGIONKEY);
     free(R_NAME);

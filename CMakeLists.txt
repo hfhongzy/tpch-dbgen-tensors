@@ -5,7 +5,7 @@ set(CMAKE_CXX_STANDARD 17)
 
 message(STATUS "C++ compiler: ${CMAKE_CXX_COMPILER}")
 
-set(TORCH_PATH "/data5/zhaoyah/libtorch")
+set(TORCH_PATH "/home/jovyan/workspace/libtorch")
 set(CMAKE_PREFIX_PATH "${TORCH_PATH}")
 
 find_package(Torch REQUIRED)
