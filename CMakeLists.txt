@@ -5,7 +5,17 @@ set(CMAKE_CXX_STANDARD 17)
 
 message(STATUS "C++ compiler: ${CMAKE_CXX_COMPILER}")
 
-set(TORCH_PATH "/home/jovyan/workspace/libtorch")
+execute_process(
+  COMMAND "python3" -c
+          "import torch, pathlib as p; print((p.Path(torch.__file__).resolve().parent / 'share' / 'cmake' / 'Torch'))"
+  OUTPUT_VARIABLE Torch_DIR_FROM_PY
+  OUTPUT_STRIP_TRAILING_WHITESPACE
+)
+
+# Expose as a cache var so find_package(Torch) can use it (and user can override)
+set(Torch_DIR "${Torch_DIR_FROM_PY}" CACHE PATH "Torch CMake package dir")
+message(STATUS "Torch_DIR resolved to: ${Torch_DIR}")
+
 set(CMAKE_PREFIX_PATH "${TORCH_PATH}")
 
 find_package(Torch REQUIRED)

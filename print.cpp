@@ -223,7 +223,7 @@ customer_columns = [
 
 
 #include <sstream>
-const std::string SAVE_ROOT = "/home/jovyan/workspace/data/";
+const std::string SAVE_ROOT = "../data/";
 
 void save_tensor(const torch::Tensor& tensor, const std::string& filename) {
     std::ostringstream full_filename;
