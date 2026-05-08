@@ -82,8 +82,14 @@
 #define INTERNAL_ERROR(p)  {fprintf(stderr,"%s", p);abort();}
 #define LN_CNT  4
 static char lnoise[4] = {'|', '/', '-', '\\' };
+/*
+ * The original macro fired a stderr fprintf on every row, costing seconds
+ * at large scale. The `n` parameter (always 1000 at call sites) was unused.
+ * Honour it now: emit the spinner once per `n` rows. No effect on data.
+ */
 #define LIFENOISE(n, var)	\
-	if (verbose > 0) fprintf(stderr, "%c\b", lnoise[(var%LN_CNT)])
+	if ((verbose > 0) && ((var) % (n) == 0)) \
+		fprintf(stderr, "%c\b", lnoise[(((var)/(n))%LN_CNT)])
 
 #define MALLOC_CHECK(var) \
     if ((var) == NULL) \

@@ -27,7 +27,10 @@ set(DBGEN_SRC
 
 add_executable(dbgen ${DBGEN_SRC})
 
-set_target_properties(dbgen PROPERTIES LINKER_LANGUAGE CXX)
+set_target_properties(dbgen PROPERTIES
+    LINKER_LANGUAGE CXX
+    INTERPROCEDURAL_OPTIMIZATION TRUE
+)
 
 target_compile_options(dbgen PRIVATE -w)
 

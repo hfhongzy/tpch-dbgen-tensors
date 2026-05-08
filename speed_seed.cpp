@@ -44,6 +44,21 @@ static DSS_HUGE Modulus =  2147483647;   /* trick you use to get 64 bit int */
 /* Nth Element of sequence starting with StartSeed */
 /* Warning, needs 64-bit integers */
 #ifdef SUPPORT_64BITS
+/*
+ * Reduce a 62-bit product mod (2^31 - 1) using the Mersenne fold.
+ * Both inputs are < 2^31 so the product is < 2^62; one fold gives
+ * a value < 2*M, then a single conditional subtraction completes
+ * the reduction. Result is identical to `% 2147483647`.
+ */
+static inline DSS_HUGE mulmod_m31(DSS_HUGE a, DSS_HUGE b)
+{
+    DSS_HUGE prod   = a * b;
+    DSS_HUGE result = (prod & 0x7FFFFFFFULL) + (prod >> 31);
+    if (result >= 0x7FFFFFFFULL)
+        result -= 0x7FFFFFFFULL;
+    return result;
+}
+
 void NthElement (long N, long *StartSeed)
    {
    DSS_HUGE Z;
@@ -56,14 +71,16 @@ void NthElement (long N, long *StartSeed)
        i = ln % LN_CNT;
        fprintf(stderr, "%c\b", lnoise[i]);
        }
+   if (N == 0) return;             /* common in row_stop hot path */
    Mult = Multiplier;
    Z = (DSS_HUGE) *StartSeed;
    while (N > 0 )
       {
-      if (N % 2 != 0)    /* testing for oddness, this seems portable */
-         Z = (Mult * Z) % Modulus;
-      N = N / 2;         /* integer division, truncates */
-      Mult = (Mult * Mult) % Modulus;
+      if (N & 1)                   /* test oddness */
+         Z = mulmod_m31(Mult, Z);
+      N >>= 1;                     /* integer division by 2 */
+      if (N == 0) break;           /* skip the final, unused Mult square */
+      Mult = mulmod_m31(Mult, Mult);
       }
    *StartSeed = (long)Z;
 

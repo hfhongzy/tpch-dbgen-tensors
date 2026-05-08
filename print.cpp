@@ -38,17 +38,23 @@ constexpr auto TQP_INT_TYPE = torch::kInt64;
 constexpr auto TQP_FLOAT_TYPE = torch::kFloat64;
 constexpr auto TQP_STR_TYPE = torch::kInt8;
 
+// All date strings the generator emits use a fixed "YYYY-MM-DD" format
+// (see mk_ascdate / mk_time). Bypass sscanf, which dominates this routine
+// at scale, and parse the ten characters directly. The integer math is
+// identical to the original, so the output tensor bytes are unchanged.
 DATE_t convert(const char *date)
 {
-    int year, month, day;
-    sscanf(date, "%d-%d-%d", &year, &month, &day);
-    
-    // Calculate the total number of days since the epoch 1990-01-01.
-    static int days_in_month[] = {31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31};
+    int year  = (date[0] - '0') * 1000 + (date[1] - '0') * 100
+              + (date[2] - '0') * 10   + (date[3] - '0');
+    int month = (date[5] - '0') * 10   + (date[6] - '0');
+    int day   = (date[8] - '0') * 10   + (date[9] - '0');
+
+    // Cumulative days at the start of each month (Jan = 0).
+    static const int days_before_month[12] = {
+        0, 31, 59, 90, 120, 151, 181, 212, 243, 273, 304, 334
+    };
     DATE_t days = (year - 1990) * 365 + (year > 1992) + (year > 1996);
-    for (int m = 0; m < month - 1; ++ m) {
-        days += days_in_month[m];
-    }
+    days += days_before_month[month - 1];
     if (month > 2 && (year == 1992 || year == 1996))
         days += 1;
     days += day - 1;

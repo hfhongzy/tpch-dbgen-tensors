@@ -15,8 +15,9 @@
 #include "config.h"
 #include <stdio.h>
 #include <math.h>
+#include <stdint.h>
 #include "dss.h"
-#include "rnd.h" 
+#include "rnd.h"
 
 char *env_config PROTO((char *tag, char *dflt));
 void NthElement(long, long *);
@@ -86,69 +87,29 @@ dump_seeds(int tbl)
 *******************************************************************/
 
 /*
- * long NextRand( long nSeed )
+ * Park-Miller Lehmer LCG: X_{n+1} = (16807 * X_n) mod (2^31 - 1).
+ *
+ * Schrage's method (the classic implementation) avoids 32-bit overflow
+ * via two divisions and a conditional add. On a 64-bit machine that is
+ * unnecessary: the product fits in a uint64_t and we can reduce mod
+ * (2^31 - 1) with shift+add, no division needed. The output is the
+ * same integer sequence, so any data produced from it is byte-identical
+ * to the original implementation.
  */
 long
 NextRand(long nSeed)
-
-/*
- * nSeed is the previous random number; the returned value is the 
- * next random number. The routine generates all numbers in the 
- * range 1 .. nM-1.
- */
-
 {
-
     /*
-     * The routine returns (nSeed * nA) mod nM, where   nA (the 
-     * multiplier) is 16807, and nM (the modulus) is 
-     * 2147483647 = 2^31 - 1.
-     * 
-     * nM is prime and nA is a primitive element of the range 1..nM-1.  
-     * This * means that the map nSeed = (nSeed*nA) mod nM, starting 
-     * from any nSeed in 1..nM-1, runs through all elements of 1..nM-1 
-     * before repeating.  It never hits 0 or nM.
-     * 
-     * To compute (nSeed * nA) mod nM without overflow, use the 
-     * following trick.  Write nM as nQ * nA + nR, where nQ = nM / nA 
-     * and nR = nM % nA.   (For nM = 2147483647 and nA = 16807, 
-     * get nQ = 127773 and nR = 2836.) Write nSeed as nU * nQ + nV, 
-     * where nU = nSeed / nQ and nV = nSeed % nQ.  Then we have:
-     * 
-     * nM  =  nA * nQ  +  nR        nQ = nM / nA        nR < nA < nQ
-     * 
-     * nSeed = nU * nQ  +  nV       nU = nSeed / nQ     nV < nU
-     * 
-     * Since nA < nQ, we have nA*nQ < nM < nA*nQ + nA < nA*nQ + nQ, 
-     * i.e., nM/nQ = nA.  This gives bounds on nU and nV as well:   
-     * nM > nSeed  =>  nM/nQ * >= nSeed/nQ  =>  nA >= nU ( > nV ).
-     * 
-     * Using ~ to mean "congruent mod nM" this gives:
-     * 
-     * nA * nSeed  ~  nA * (nU*nQ + nV)
-     * 
-     * ~  nA*nU*nQ + nA*nV
-     * 
-     * ~  nU * (-nR)  +  nA*nV      (as nA*nQ ~ -nR)
-     * 
-     * Both products in the last sum can be computed without overflow   
-     * (i.e., both have absolute value < nM) since nU*nR < nA*nQ < nM, 
-     * and  nA*nV < nA*nQ < nM.  Since the two products have opposite 
-     * sign, their sum lies between -(nM-1) and +(nM-1).  If 
-     * non-negative, it is the answer (i.e., it's congruent to 
-     * nA*nSeed and lies between 0 and nM-1). Otherwise adding nM 
-     * yields a number still congruent to nA*nSeed, but now between 
-     * 0 and nM-1, so that's the answer.
+     * prod < 2^46 (since nSeed < 2^31 and 16807 < 2^15). Mod a Mersenne
+     * prime M = 2^31 - 1 reduces to (low31 + high) since 2^31 ≡ 1 (mod M).
+     * After one fold the result is < 2*M, so a single conditional
+     * subtraction finishes the reduction.
      */
-
-    long            nU, nV;
-
-    nU = nSeed / nQ;
-    nV = nSeed - nQ * nU;       /* i.e., nV = nSeed % nQ */
-    nSeed = nA * nV - nU * nR;
-    if (nSeed < 0)
-        nSeed += nM;
-    return (nSeed);
+    uint64_t prod   = (uint64_t)(unsigned long)nSeed * 16807ULL;
+    uint64_t result = (prod & 0x7FFFFFFFULL) + (prod >> 31);
+    if (result >= 0x7FFFFFFFULL)
+        result -= 0x7FFFFFFFULL;
+    return (long)result;
 }
 
 /******************************************************************

@@ -339,7 +339,8 @@ mk_order(long index, order_t *o, long upd_num)
         RANDOM(o->l[lcnt].tax, L_TAX_MIN, L_TAX_MAX, L_TAX_SD);
         pick_str(&l_instruct_set, L_SHIP_SD, o->l[lcnt].shipinstruct);
         pick_str(&l_smode_set, L_SMODE_SD, o->l[lcnt].shipmode);
-        o->l[lcnt].clen = TEXT(L_CMNT_LEN, L_CMNT_SD, o->l[lcnt].comment);
+        /* L_CMNT is not persisted; row_stop catches the L_CMNT_SD stream
+         * up by its full boundary, so the seed state stays identical. */
         RANDOM(o->l[lcnt].partkey, L_PKEY_MIN, L_PKEY_MAX, L_PKEY_SD);
         RPRICE_BRIDGE( rprice, o->l[lcnt].partkey);
         RANDOM(supp_num, 0, 3, L_SKEY_SD);
@@ -444,15 +445,20 @@ mk_part(long index, part_t *p)
 	RANDOM(p->size, P_SIZE_MIN, P_SIZE_MAX, P_SIZE_SD);
 	pick_str(&p_cntr_set, P_CNTR_SD, p->container);
 	RPRICE_BRIDGE( p->retailprice, index);
-	p->clen = TEXT(P_CMNT_LEN, P_CMNT_SD, p->comment);
-	
+	/*
+	 * Skip P_CMNT / PS_CMNT text generation: these comment fields are
+	 * never persisted to tensors (see print.cpp). row_stop advances the
+	 * P_CMNT_SD / PS_CMNT_SD streams by their full boundary regardless
+	 * of actual usage, so the seed state after this row -- and thus every
+	 * downstream byte we *do* save -- is identical to the original path.
+	 */
+
 	for (snum = 0; snum < SUPP_PER_PART; snum++)
 		{
 		p->s[snum].partkey = p->partkey;
 		PART_SUPP_BRIDGE( p->s[snum].suppkey, index, snum);
 		RANDOM(p->s[snum].qty, PS_QTY_MIN, PS_QTY_MAX, PS_QTY_SD);
 		RANDOM(p->s[snum].scost, PS_SCST_MIN, PS_SCST_MAX, PS_SCST_SD);
-		p->s[snum].clen = TEXT(PS_CMNT_LEN, PS_CMNT_SD, p->s[snum].comment);
 		}
 	return (0);
 	}
@@ -573,18 +579,19 @@ mk_time(long index, dss_time_t *t)
 		c->code = index - 1;
 		c->text = nations.list[index - 1].text;
 	c->join = nations.list[index - 1].weight;
-		c->clen = TEXT(N_CMNT_LEN, N_CMNT_SD, c->comment);
+		/* N_COMMENT is not saved to tensors; let row_stop advance the
+		 * N_CMNT_SD stream by boundary instead of generating text. */
 		return(0);
 		}
-	
-	int 
+
+	int
 		mk_region(long index, code_t *c)
 		{
-		
+
 		c->code = index - 1;
 		c->text = regions.list[index - 1].text;
 		c->join = 0;        /* for completeness */
-		c->clen = TEXT(R_CMNT_LEN, R_CMNT_SD, c->comment);
+		/* R_COMMENT is not saved to tensors; row_stop catches up. */
 		return(0);
 		}
 

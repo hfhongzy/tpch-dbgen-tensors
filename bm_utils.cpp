@@ -204,14 +204,25 @@ e_str(distribution *d, int min, int max, int stream, char *dest)
 int
 pick_str(distribution *s, int c, char *target)
 {
-    long      i = 0;
     long      j;
 
     RANDOM(j, 1, s->list[s->count - 1].weight, c);
-    while (s->list[i].weight < j)
-        i++;
-    strcpy(target, s->list[i].text);
-    return(i);
+    /*
+     * Cumulative weights are monotonically non-decreasing, so binary
+     * search returns the same index as the original linear scan but in
+     * O(log n). Result is byte-identical for every distribution.
+     */
+    long lo = 0, hi = s->count - 1;
+    while (lo < hi)
+    {
+        long mid = (lo + hi) >> 1;
+        if (s->list[mid].weight < j)
+            lo = mid + 1;
+        else
+            hi = mid;
+    }
+    strcpy(target, s->list[lo].text);
+    return((int)lo);
 }
 
 /*
